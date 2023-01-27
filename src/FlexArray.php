@@ -1,8 +1,8 @@
 <?php
 
-namespace Sitnikovik;
+namespace Benb0nes\FlexArray;
 
-class Collection
+class FlexArray
 {
     /**
      * Array to be processed.
@@ -88,9 +88,19 @@ class Collection
      *
      * @return array
      */
-    public function all()
+    public function getAll()
     {
         return $this->haystack;
+    }
+
+    /**
+     * Return keys of the haystack.
+     *
+     * @return int[]|string[]
+     */
+    public function getKeys()
+    {
+        return array_keys($this->getAll());
     }
 
     /**
@@ -99,7 +109,7 @@ class Collection
      * @param int|string ...$keys
      * @return array
      */
-    public function allBut(...$keys)
+    public function getAllBut(...$keys)
     {
         $haystack = $this->haystack;
         foreach ($keys as $arg) {
@@ -109,6 +119,67 @@ class Collection
         }
 
         return $haystack;
+    }
+
+    /**
+     * Returns list of integer values indexed by its keys.
+     *
+     * @return array
+     */
+    public function getAllIntegers()
+    {
+        $filtered = [];
+        foreach ($this->getAll() as $key => $value) {
+            if (is_integer($value)) {
+                $filtered[$key] = $value;
+            }
+        }
+
+        return $filtered;
+    }
+
+    /**
+     * Returns list of string values indexed by its keys.
+     *
+     * @return array
+     */
+    public function getAllStrings()
+    {
+        $filtered = [];
+        foreach ($this->getAll() as $key => $value) {
+            if (is_string($value)) {
+                $filtered[$key] = $value;
+            }
+        }
+
+        return $filtered;
+    }
+
+    /**
+     * Returns list of boolean values indexed by its keys.
+     *
+     * @return array
+     */
+    public function getAllBooleans()
+    {
+        $filtered = [];
+        foreach ($this->getAll() as $key => $value) {
+            if (is_bool($value)) {
+                $filtered[$key] = $value;
+            }
+        }
+
+        return $filtered;
+    }
+
+    /**
+     * Returns the haystack length.
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->haystack);
     }
 
     /**
@@ -153,6 +224,27 @@ class Collection
     }
 
     /**
+     * Remove haystack elements by values if exists.
+     *
+     * @param mixed ...$values
+     * @return $this
+     */
+    public function deleteOnFound(...$values)
+    {
+        $haystack = $this->getAll();
+
+        foreach ($values as $needle) {
+            foreach ($haystack as $key => $value) {
+                if ($needle === $value) {
+                    $this->delete($key);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Returns list of keys of not real empty values.
      *
      * @param int|string ...$keys
@@ -161,10 +253,43 @@ class Collection
     public function touch(...$keys)
     {
         $filtered = array_filter($keys, function ($key) {
-            return $this->touchable($key);
-        });
+            return $this->isEmpty($key);
+        }, ARRAY_FILTER_USE_KEY);
 
         return array_values(array_unique($filtered));
+    }
+
+    /**
+     * Cleans real empty values in the haystack.
+     *
+     * @return $this
+     */
+    public function clean()
+    {
+        foreach ($this->getAll() as $key => $value) {
+            if (!$this->isEmpty($key)) {
+                $this->delete($key);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the haystack of not real empty values.
+     *
+     * @return array
+     */
+    public function getAllCleaned()
+    {
+        $isEmpty = [];
+        foreach ($this->getAll() as $key => $value) {
+            if ($this->touch($value)) {
+                $isEmpty[] = $value;
+            }
+        }
+
+        return $isEmpty;
     }
 
     /**
@@ -173,7 +298,7 @@ class Collection
      * @param int|string $key
      * @return bool
      */
-    public function touchable($key)
+    public function isEmpty($key)
     {
         if (!isset($this->haystack[$key])) {
             return false;
@@ -191,33 +316,72 @@ class Collection
     }
 
     /**
-     * Defines if collection has any value by any provided key.
+     * Returns list of keys of set values even nullable
      *
      * @param int|string ...$keys
      * @return array
      */
-    public function has(...$keys)
+    public function findBy(...$keys)
     {
         $filtered = array_filter($keys, function ($key) {
-            return $this->exists($key);
-        });
+            return $this->keyExists($key);
+        }, ARRAY_FILTER_USE_KEY);
 
         return array_values(array_unique($filtered));
     }
 
     /**
-     * Defines if the given key or index exists in the haystack.
+     * Returns list of found values in haystack.
+     *
+     * @param mixed ...$values
+     * @return array
+     */
+    public function find(...$values)
+    {
+        $filtered = [];
+        foreach ($values as $value) {
+            foreach ($this->haystack as $_value) {
+                if ($value === $_value) {
+                    $filtered[] = $_value;
+                }
+            }
+        }
+
+        return array_unique($filtered);
+    }
+
+    /**
+     * Defines if the given key or index exists in the haystack even nullable.
      *
      * @param int|string $key
      * @return bool
      */
-    public function exists($key)
+    public function keyExists($key)
     {
         return array_key_exists($key, $this->haystack);
     }
 
     /**
+     * Returns key of value in the haystack or null on found.
+     *
+     * @param $needle
+     * @return int|string|null
+     */
+    public function keyOf($needle)
+    {
+        foreach ($this->haystack as $key => $value) {
+            if ($value === $needle) {
+                return $key;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Binary search method for integer value in haystack.
+     *
+     * Sorts the haystack due the process.
      *
      * Returns the integer index of value on found or `-1` on not.
      *
@@ -229,14 +393,18 @@ class Collection
         if (empty($this->haystack)) {
             return -1;
         }
+
+        $haystack = $this->haystack;
+        sort($haystack);
+
         $len = count($this->haystack);
         $lower = 0;
         $high = $len - 1;
         while ($lower <= $high) {
             $middle = intval(($lower + $high) / 2);
-            if ($this->haystack[$middle] > $needle) {
+            if ($haystack[$middle] > $needle) {
                 $high = $middle - 1;
-            } else if ($this->haystack[$middle] < $needle) {
+            } else if ($haystack[$middle] < $needle) {
                 $lower = $middle + 1;
             } else {
                 return $middle;
