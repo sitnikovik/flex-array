@@ -138,7 +138,7 @@ class FlexArray
     {
         $isEmpty = [];
         foreach ($this->getAll() as $key => $value) {
-            if (!$this->isEmpty($value)) {
+            if (!$this->isEmpty($key)) {
                 $isEmpty[$key] = $value;
             }
         }
@@ -210,7 +210,7 @@ class FlexArray
      */
     public function getByIndex($index)
     {
-        if (!$this->assertCount($index)) {
+        if (!$this->inCount($index)) {
             return null;
         }
 
@@ -235,19 +235,15 @@ class FlexArray
      */
     public function getUpTo($index)
     {
-        if (!$this->assertCount($index)) {
-            return [];
-        }
-
         $i = 0;
-        $haystack = ($index > 0) ? $this->getAll() : array_reverse($this->getAll());
+        $haystack = ($index >= 0) ? $this->getAll() : array_reverse($this->getAll());
         $values = [];
 
-        foreach ($haystack as $value) {
-            $condition = ($index > 0) ? ($i <= $index) : ($i > $index);
+        foreach ($haystack as $key => $value) {
+            $condition = ($index >= 0) ? ($i <= $index) : ($i >= $index);
             if ($condition) {
-                $value[] = $value;
-                $i = ($index > 0) ? $i + 1 : $i - 1;
+                $values[$key] = $value;
+                $i = ($index >= 0) ? $i + 1 : $i - 1;
             } else {
                 break;
             }
@@ -265,7 +261,7 @@ class FlexArray
      * @param bool $associative
      * @return string
      */
-    public function implodeAll($separator, $associative)
+    public function implodeAll($separator, $associative = false)
     {
         $result = [];
         foreach ($this->haystack as $key => $value) {
@@ -290,7 +286,8 @@ class FlexArray
      * @param bool $associative
      * @return string
      */
-    public function implode($separator, $associative = false) {
+    public function implode($separator, $associative = false)
+    {
         $strings = [];
         foreach ($this->haystack as $key => $value) {
             if (is_scalar($value)) {
@@ -425,7 +422,7 @@ class FlexArray
      */
     public function getKeyOfIndex($index)
     {
-        if (!$this->assertCount($index)) {
+        if (!$this->inCount($index)) {
             return null;
         }
 
@@ -448,6 +445,8 @@ class FlexArray
      * Sorts the haystack due the process.
      *
      * Returns the integer index of value on found or null on not.
+     *
+     * | Note that it works only with integer values.
      *
      * @param int $needle
      * @return int|null
@@ -529,15 +528,19 @@ class FlexArray
      */
     public function touch(...$keys)
     {
-        $filtered = array_filter($keys, function ($key) {
-            return !$this->isEmpty($key);
-        });
+        $filtered = [];
 
-        return array_values(array_unique($filtered));
+        foreach ($keys as $key) {
+            if (!$this->isEmpty($key)) {
+                $filtered[$key] = $this->get($key);
+            }
+        }
+
+        return $filtered;
     }
 
     /**
-     * Returns list of found values in haystack.
+     * Returns list of found values associated with found keys in haystack.
      *
      * @param mixed ...$values
      * @return array
@@ -546,9 +549,9 @@ class FlexArray
     {
         $filtered = [];
         foreach ($values as $value) {
-            foreach ($this->haystack as $_value) {
+            foreach ($this->haystack as $key => $_value) {
                 if ($value === $_value) {
-                    $filtered[] = $_value;
+                    $filtered[$key] = $_value;
                 }
             }
         }
@@ -666,7 +669,7 @@ class FlexArray
      */
     public function deleteByIndex($index)
     {
-        if (!$this->assertCount($index)) {
+        if (!$this->inCount($index)) {
             return null;
         }
 
@@ -1011,7 +1014,7 @@ class FlexArray
      * @param $count
      * @return bool
      */
-    public function assertCount($count)
+    public function inCount($count)
     {
         return abs($count) <= $this->count();
     }
@@ -1042,7 +1045,7 @@ class FlexArray
     public function assertAnyEquals(...$values)
     {
         foreach ($this->haystack as $value) {
-            if (in_array($value, $value)) {
+            if (in_array($value, $values)) {
                 return true;
             }
         }

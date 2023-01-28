@@ -9,7 +9,7 @@ You have to provide you array to constructor and after that you can do a lot of 
 ```php
 // Some array to be processed.
 $array = [
-    [0, 1, 2, 3],
+    [0, 1, 2, 3, 5],
     'fruits' => ['apple', 'orange'],
     'persons' => [
         'john_doe' => [
@@ -54,7 +54,6 @@ $array = new FlexArray($array);
 * [implodeAll](#implodeall)
 * [implode](#implode)
 * [implodeKeys](#implodekeys)
-* [touch](#touch)
 * [count](#count)
 * [keyOf](#keyof)
 * [keysOf](#keysof)
@@ -104,7 +103,7 @@ $array = new FlexArray($array);
 * [hasAnyKey](#hasanykey)
 * [hasValues](#hasvalues)
 * [hasAnyValue](#hasanyvalue)
-* [assertCount](#assertcount)
+* [inCount](#incount)
 * [assertEquals](#assertequals)
 * [assertAnyEquals](#assertanyequals)
 * [assertEqualsByKey](#assertequalsbykey)
@@ -284,7 +283,7 @@ Pass `true` in `$associative` to represent in indexed by its keys.
 ```php
 findValues(mixed ...$values): array
 ```
-Returns list of found values in haystack.
+Returns list of found values associated with found keys in haystack.
 
 ## Setters ########################
 ___
@@ -527,14 +526,11 @@ hasAnyValue(mixed ...$values): bool
 ```
 Defines if the haystack has any value provided.
 
-### assertCount
+### inCount
 ```php
-assertCount(int ...$count): bool
+inCount(int ...$count): bool
 ```
 Defines if the haystack length in provided value.
-
-
-
 
 ### assertEquals
 ```php
