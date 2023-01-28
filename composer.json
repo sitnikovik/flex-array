@@ -14,5 +14,7 @@
             "email": "sitnikovik@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "ext-json": "*"
+    }
 }
