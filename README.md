@@ -100,8 +100,6 @@ $array = new FlexArray($array);
 * [hasValues](#hasvalues)
 * [hasAnyValue](#hasanyvalue)
 * [inCount](#incount)
-* [assertEquals](#assertequals)
-* [assertAnyEquals](#assertanyequals)
 * [assertEqualsByKey](#assertequalsbykey)
 * [assertAnyEqualsByKey](#assertanyequalsbykey)
 
@@ -527,18 +525,6 @@ Defines if the haystack has any value provided.
 inCount(int ...$count): bool
 ```
 Defines if the haystack length in provided value.
-
-### assertEquals
-```php
-assertEquals(mixed ...$values): bool
-```
-Asserts if each value identically equals the value in the haystack.
-
-### assertAnyEquals
-```php
-assertAnyEquals(int|string $key, mixed ...$values): bool
-```
-Asserts if any value identically equals the value in the haystack.
 
 ### assertEqualsByKey
 ```php

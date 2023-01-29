@@ -1,6 +1,6 @@
 <?php
 
-namespace Benb0nes\FlexArray;
+namespace sitnikovik\FlexArray;
 
 use Exception;
 use RuntimeException;
@@ -739,7 +739,7 @@ class FlexArray
      */
     public function unique($flags = SORT_STRING)
     {
-        $this->haystack = array_unique($this->haystack);
+        $this->haystack = array_unique($this->haystack, $flags);
 
         return $this;
     }
@@ -987,13 +987,13 @@ class FlexArray
      */
     public function hasValues(...$values)
     {
-        foreach ($this->haystack as $value) {
-            if (!in_array($value, $values)) {
-                return true;
+        foreach ($values as $value) {
+            if (!in_array($value, $this->haystack)) {
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -1004,7 +1004,7 @@ class FlexArray
      */
     public function hasAnyValue(...$values)
     {
-        foreach ($this->haystack as $key => $value) {
+        foreach ($this->haystack as $value) {
             if (in_array($value, $values)) {
                 return true;
             }
@@ -1025,57 +1025,15 @@ class FlexArray
     }
 
     /**
-     * Asserts if each value identically equals the value in the haystack.
-     *
-     * @param mixed ...$values
-     * @return bool
-     */
-    public function assertEquals(...$values)
-    {
-        foreach ($values as $value) {
-            if (!in_array($value, $this->haystack)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Asserts if any value identically equals the value in the haystack.
-     *
-     * @param mixed ...$values
-     * @return bool
-     */
-    public function assertAnyEquals(...$values)
-    {
-        foreach ($this->haystack as $value) {
-            if (in_array($value, $values)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Asserts if each value identically equals the value in the haystack by key.
+     * Asserts if value identically equals the value in the haystack by key.
      *
      * @param int|string $key
-     * @param mixed ...$values
+     * @param mixed $value
      * @return bool
      */
-    public function assertEqualsByKey($key, ...$values)
+    public function assertEqualsByKey($key, $value)
     {
-        $needle = $this->get($key);
-
-        foreach ($values as $value) {
-            if ($value !== $needle) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->get($key) === $value;
     }
 
     /**

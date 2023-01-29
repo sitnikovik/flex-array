@@ -1,11 +1,11 @@
 {
-    "name": "benb0nes/flex-array",
-    "description": "A powerful tool for representing an array as an object collection for reading and modifying it.",
+    "name": "sitnikovik/flex-array",
+    "description": "A powerful lightweight tool for representing an array as an object collection for reading and modifying it.",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Benb0nes\\FlexArray\\": "src/"
+            "sitnikovik\\FlexArray\\": "src"
         }
     },
     "authors": [

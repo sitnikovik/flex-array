@@ -1,6 +1,6 @@
 <?php
 
-use Benb0nes\FlexArray\FlexArray;
+use sitnikovik\FlexArray\FlexArray;
 
 include __DIR__ . '/src/FlexArray.php';
 
@@ -171,6 +171,12 @@ $result[] = test(
     $flex->indexesOf(['apple', 'orange']) === [1]
 );
 
+/** indexOfKey */
+$result[] = test(
+    $flex->indexOfKey('fruits') === 1,
+    $flex->indexOfKey(1) === null
+);
+
 /** binarySearch */
 $result[] = test(
     $flex->binarySearch(0) === null,
@@ -248,6 +254,10 @@ $result[] = test(
     $flex->deleteByIndex(123)->getAll() === $_array
 );
 
+/** deleteAll */
+$flex = new FlexArray($array);
+$result[] = test($flex->deleteAll()->getAll() === []);
+
 /** flip */
 $flex = new FlexArray($array);
 $_array = array_flip($array['fruits']);
@@ -308,9 +318,9 @@ $result[] = test(
 );
 
 /** ############## FACTORIES ################# */
+$flex = new FlexArray($array);
 
 /** createBy */
-$flex = new FlexArray($array);
 $_flex = new FlexArray($array['persons']);
 $result[] = test(
     $flex->createBy('persons')->getAll() === $_flex->getAll(),
@@ -318,23 +328,84 @@ $result[] = test(
 );
 
 /** createByFirst */
-$flex = new FlexArray($array);
 $_flex = new FlexArray($array[0]);
 $result[] = test($flex->createByFirst()->getAll() === $_flex->getAll());
 
 /** createByLast */
-$flex = new FlexArray($array);
 $_flex = new FlexArray($array['persons']);
 $result[] = test($flex->createByLast()->getAll() === $_flex->getAll());
 
 /** createByIndex */
-$flex = new FlexArray($array);
 $_flex = new FlexArray($array['fruits']);
 $result[] = test($flex->createByIndex(1)->getAll() === $_flex->getAll());
 
 /** ############## PREDICATES ############ */
 
 /** isEmpty */
+$result[] = test(
+    $flex->isEmpty('fruits') === false,
+    $flex->isEmpty(1) === true,
+    $flex->createBy('persons')->createBy('mike_shepard')->isEmpty('comment') === true,
+    $flex->createBy('persons')->createBy('mike_shepard')->isEmpty('isActive') === true
+);
+
+/** keyExists */
+$result[] = test(
+    $flex->keyExists('fruits') === true,
+    $flex->keyExists(1) === false,
+    $flex->createBy('persons')->createBy('mike_shepard')->keyExists('comment') === true,
+    $flex->createBy('persons')->createBy('mike_shepard')->keyExists('isActive') === true
+);
+
+/** hasKeys */
+$result[] = test(
+    $flex->hasKeys('fruits', 1) === false,
+    $flex->hasKeys('fruits', 'persons') === true,
+    $flex->hasKeys('fruits', 1, 'persons') === false
+);
+
+/** hasAnyKey */
+$result[] = test(
+    $flex->hasAnyKey('fruits', 1) === true,
+    $flex->hasAnyKey('fruits', 'persons') === true
+);
+
+/** hasValues */
+$result[] = test(
+    $flex->hasValues(['apple', 'orange']) === true,
+    $flex->hasValues(['apple', 'orange'], 'persons') === false,
+    $flex->hasValues('0', ['apple', 'orange'], 'persons') === false
+);
+
+/** hasAnyValue */
+$result[] = test(
+    $flex->hasAnyValue(['apple', 'orange']) === true,
+    $flex->hasAnyValue(['apple', 'orange'], 'persons') === true,
+    $flex->hasAnyValue('0', ['apple', 'orange'], 'persons') === true,
+    $flex->hasAnyValue(['apple', 'oranges'], 'persons') === false
+);
+
+/** inCount */
+$result[] = test(
+    $flex->inCount(1) === true,
+    $flex->inCount(3) === true,
+    $flex->inCount(4) === false,
+    $flex->inCount(-1) === true,
+    $flex->inCount(-4) === false
+);
+
+/** assertEqualsByKey */
+$result[] = test(
+    $flex->assertEqualsByKey('fruits', ['apple', 'orange']) === true,
+    $flex->assertEqualsByKey(0, ['apple', 'orange']) === false,
+    $flex->assertEqualsByKey('apple', null) == true
+);
+
+/** assertAnyEqualsByKey */
+$result[] = test(
+    $flex->assertAnyEqualsByKey('fruits', ['apple'], ['apple', 'orange']) === true,
+    $flex->assertAnyEqualsByKey('fruits', ['apple'], ['apple', 'oranges']) === false
+);
 
 
 /** print result  */
