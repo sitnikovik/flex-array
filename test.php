@@ -200,5 +200,142 @@ $result[] = test(
     $flex->createBy('persons')->createByFirst()->findValues('true') === []
 );
 
+
+/** ############# SETTERS ################ */
+
+/** set */
+$result[] = test($flex->set('fruits', 'apple')->get('fruits') === 'apple');
+
+/** prepend */
+$flex = new FlexArray($array);
+$result[] = test($flex->prepend('apple')->getAll() === array_merge([], ['apple'], $array));
+
+/** append */
+$flex = new FlexArray($array);
+$result[] = test($flex->append('apple')->getAll() === array_merge([], $array, ['apple']));
+
+/** delete */
+$flex = new FlexArray($array);
+$_array = $array;
+unset($_array['fruits']);
+$result[] = test($flex->delete('fruits')->getAll() === $_array);
+
+/** deleteOnFound */
+$flex = new FlexArray($array);
+$result[] = test(
+    $flex->deleteOnFound(['apple', 'orange'])->getAll() === $_array,
+    $flex->deleteOnFound('apple')->getAll() === $_array
+);
+
+/** deleteFirst */
+$flex = new FlexArray($array);
+$_array = $array;
+unset($_array[0]);
+$result[] = test($flex->deleteFirst()->getAll() === $_array);
+
+/** deleteLast */
+$flex = new FlexArray($array);
+$_array = $array;
+unset($_array['persons']);
+$result[] = test($flex->deleteLast()->getAll() === $_array);
+
+/** deleteByIndex */
+$flex = new FlexArray($array);
+$_array = $array;
+unset($_array[0]);
+$result[] = test(
+    $flex->deleteByIndex(0)->getAll() === $_array,
+    $flex->deleteByIndex(123)->getAll() === $_array
+);
+
+/** flip */
+$flex = new FlexArray($array);
+$_array = array_flip($array['fruits']);
+$result[] = test($flex->createBy('fruits')->flip()->getAll() === $_array);
+
+/** merge */
+$flex = new FlexArray($array);
+$_array = array_merge($array, ['cars' => ['bmw', 'audi']]);
+$result[] = test($flex->merge(['cars' => ['bmw', 'audi']])->getAll() === $_array);
+
+/** unique */
+$flex = new FlexArray($array);
+$_array = array_unique($array[0]);
+$result[] = test($flex->createByFirst()->unique()->getAll() === $_array);
+
+/** sort */
+$flex = new FlexArray($array);
+$_array = $array;
+sort($_array);
+$result[] = test($flex->sort()->getAll() === $_array);
+
+/** rsort */
+$flex = new FlexArray($array);
+$_array = $array;
+rsort($_array);
+$result[] = test($flex->rsort()->getAll() === $_array);
+
+/** ksort */
+$flex = new FlexArray($array);
+$_array = $array;
+ksort($_array);
+$result[] = test($flex->ksort()->getAll() === $_array);
+
+/** krsort */
+$flex = new FlexArray($array);
+$_array = $array;
+krsort($_array);
+$result[] = test($flex->krsort()->getAll() === $_array);
+
+/** asort */
+$flex = new FlexArray($array);
+$_array = $array;
+asort($_array);
+$result[] = test($flex->asort()->getAll() === $_array);
+
+/** arsort */
+$flex = new FlexArray($array);
+$_array = $array;
+arsort($_array);
+$result[] = test($flex->arsort()->getAll() === $_array);
+
+/** clean */
+$flex = new FlexArray($array);
+$result[] = test(
+    $flex->clean()->getAll() === $_array,
+    $flex->createByFirst()->clean()->getAll() === [0, 1, 2, 3, 5],
+    $flex->createBy('persons')->createBy('mike_shepard')->clean()->getAll() === ['name' => 'Mike Shepard',]
+);
+
+/** ############## FACTORIES ################# */
+
+/** createBy */
+$flex = new FlexArray($array);
+$_flex = new FlexArray($array['persons']);
+$result[] = test(
+    $flex->createBy('persons')->getAll() === $_flex->getAll(),
+    $flex->createBy('john_doe')->getAll() === []
+);
+
+/** createByFirst */
+$flex = new FlexArray($array);
+$_flex = new FlexArray($array[0]);
+$result[] = test($flex->createByFirst()->getAll() === $_flex->getAll());
+
+/** createByLast */
+$flex = new FlexArray($array);
+$_flex = new FlexArray($array['persons']);
+$result[] = test($flex->createByLast()->getAll() === $_flex->getAll());
+
+/** createByIndex */
+$flex = new FlexArray($array);
+$_flex = new FlexArray($array['fruits']);
+$result[] = test($flex->createByIndex(1)->getAll() === $_flex->getAll());
+
+/** ############## PREDICATES ############ */
+
+/** isEmpty */
+
+
 /** print result  */
 echo implode('', $result);

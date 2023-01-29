@@ -670,7 +670,7 @@ class FlexArray
     public function deleteByIndex($index)
     {
         if (!$this->inCount($index)) {
-            return null;
+            return $this;
         }
 
         $i = 0;
@@ -706,11 +706,13 @@ class FlexArray
     /**
      * Flips the haystack.
      *
+     * Note that it works on integer or string values. Otherwise, it will be slipped and warning be thrown
      * @return $this
      */
     public function flip()
     {
         $this->haystack = array_flip($this->haystack);
+
         return $this;
     }
 
@@ -728,13 +730,16 @@ class FlexArray
     }
 
     /**
-     * Removes duplicate values from the haystack
+     * Removes duplicate values from the haystack.
+     *
+     * Note that it works with scalar values and PHP warning will be thrown if not.
+     *
      * @param int $flags
      * @return $this
      */
     public function unique($flags = SORT_STRING)
     {
-        $this->haystack = array_unique($this->haystack, $flags);
+        $this->haystack = array_unique($this->haystack);
 
         return $this;
     }
@@ -812,7 +817,7 @@ class FlexArray
      */
     public function arsort($flags = SORT_REGULAR)
     {
-        asort($this->haystack, $flags);
+        arsort($this->haystack, $flags);
 
         return $this;
     }

@@ -88,10 +88,6 @@ $array = new FlexArray($array);
 
 ## Factories
 * [createBy](#createby)
-* [createBy](#createby)
-
-## Factories
-* [createBy](#createby)
 * [createByFirst](#createbyfirst)
 * [createByLast](#createbylast)
 * [createByIndex](#createbyindex)
